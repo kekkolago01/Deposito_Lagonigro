@@ -1,7 +1,7 @@
 #1
 
-numero= int (input ("Inserisci un numero ")) # da x numero e fa il conto alla rovescia
-for numero1 in range (numero , 0, -1) :
+numero1= int (input ("Inserisci un numero ")) # da x numero e fa il conto alla rovescia
+for numero1 in range (numero1 , 0, -1) :
     print (numero1)
     
 ripeti= input("Vuoi ripetere l'operazione? ")
