@@ -1,3 +1,4 @@
+
 #esercizio 1
 livello1= int(input("Inserisci un numero a piacere!"))
 if livello1 > 0:
