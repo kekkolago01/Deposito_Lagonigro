@@ -12,7 +12,7 @@ lista_risultati = []                                  # Lista vuota dove salvere
 sistema_attivo = True                                 # Mantiene attivo il programma generale
 
 while sistema_attivo:
-    print("\n=== MENU PRINCIPALE ===")                  # Stampa a schermo il titolo del menu
+    print("=== MENU PRINCIPALE ===")                  # Stampa a schermo il titolo del menu
     print("1. Registrazione")                          # Opzione per registrarsi
     print("2. Login")                                  # Opzione per accedere
     print("3. Esci dal programma")                     # Opzione per chiudere lo script
@@ -23,7 +23,7 @@ while sistema_attivo:
 
         case "1":
             # OPERAZIONE: REGISTRAZIONE OBBLIGATORIA
-            print("\n--- REGISTRAZIONE UTENTE ---")
+            print("--- REGISTRAZIONE UTENTE ---")
             
             # Ciclo while per l'inserimento del nome non vuoto
             nome_input = ""                           # Variabile di supporto per il controllo
@@ -47,7 +47,7 @@ while sistema_attivo:
 
         case "2":
             # OPERAZIONE: LOGIN
-            print("\n--- LOGIN UTENTE ---")
+            print("--- LOGIN UTENTE ---")
 
             # Verifichiamo prima se l'utente si è registrato
             if dati_registrati == False:              # Se dati_registrati è ancora False
@@ -59,13 +59,13 @@ while sistema_attivo:
 
                 # Verifichiamo se nome == nome e codice == codice
                 if nome_login == nome_registrato and codice_login == codice_registrato:
-                    print("\nLogin effettuato! Benvenuto/a", nome_registrato) # Usiamo la virgola al posto della f-string
+                    print("Login effettuato! Benvenuto/a", nome_registrato) # Usiamo la virgola al posto della f-string
                     
                     # Variabile per il secondo ciclo while (Menu Operazioni)
                     utente_loggato = True             # Mantiene l'utente dentro il menu di login
 
                     while utente_loggato:
-                        print("\n=== MENU OPERAZIONI ===") # Menu secondario di secondo livello
+                        print("=== MENU OPERAZIONI ===") # Menu secondario di secondo livello
                         print("1. Calcola Somma")      # Opzione per la somma
                         print("2. Calcola Sottrazione") # Opzione per la sottrazione
                         print("3. Visualizza Risultati Salvati") # Opzione per vedere i risultati
