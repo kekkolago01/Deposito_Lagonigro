@@ -1,0 +1,259 @@
+from datetime import datetime  # Importa datetime per ottenere l'anno corrente ed effettuare controlli sulle date
+
+# 1. CLASSE BASE: Elettrodomestico
+
+class Elettrodomestico:
+    def __init__(self, marca: str, modello: str, anno_acquisto: int, guasto: str):
+        self.__marca = marca             # Attributo privato per la marca dell'elettrodomestico
+        self.__modello = modello              # Attributo privato per il modello
+        self.set_anno_acquisto(anno_acquisto)           # Chiama il setter per validare l'anno prima di assegnarlo
+        self.__guasto = guasto           # Attributo privato che descrive il guasto riscontrato
+
+    
+    def get_marca(self):            # Getter per la marca
+        return self.__marca
+
+    
+    def set_marca(self, marca):         # Setter per la marca
+        self.__marca = marca
+
+    
+    def get_modello(self):          # Getter per il modello
+        return self.__modello
+
+    
+    def set_modello(self, modello):         # Setter per il modello
+        self.__modello = modello
+
+    
+    def get_anno_acquisto(self):            # Getter per l'anno di acquisto
+        return self.__anno_acquisto
+
+    
+    def set_anno_acquisto(self, anno_acquisto):         # Setter con controllo di validità (l'anno non può essere nel futuro)
+        anno_corrente = datetime.now().year              # Ricava l'anno attuale dal sistema
+        if anno_acquisto > anno_corrente:
+            raise ValueError(f"L'anno di acquisto ({anno_acquisto}) non può essere nel futuro!")
+        self.__anno_acquisto = anno_acquisto
+
+    
+    def get_guasto(self):           # Getter per il guasto
+        return self.__guasto
+
+    
+    def set_guasto(self, guasto):           # Setter per il guasto
+        self.__guasto = guasto
+
+    
+    def descrizione(self):          # Restituisce una stringa riassuntiva con i dati principali dell'elettrodomestico
+        return f"Marca: {self.__marca}, Modello: {self.__modello}, Anno: {self.__anno_acquisto}, Guasto: {self.__guasto}"
+
+    
+    def stima_costo_base(self):         # Restituisce un costo base generico di diagnosi valido per tutti gli elettrodomestici
+        return 30.0
+
+
+# 2. CLASSI DERIVATE (Ereditarietà + Polimorfismo)
+
+class Lavatrice(Elettrodomestico):
+    def __init__(self, marca, modello, anno_acquisto, guasto, capacita_kg: int, giri_centrifuga: int):
+        super().__init__(marca, modello, anno_acquisto, guasto)              # Inizializza gli attributi ereditati dalla classe padre
+        self.capacita_kg = capacita_kg            # Capacità specifica della lavatrice in kg
+        self.giri_centrifuga = giri_centrifuga            # Velocità di centrifuga della lavatrice
+
+    # Override del metodo stima_costo_base con logica specifica per le lavatrici
+    def stima_costo_base(self):
+        base = super().stima_costo_base()           # Recupera il costo base standard dalla classe padre
+        if self.capacita_kg > 8:
+            return base + 20.0              # Maggiorazione se la capacità supera gli 8 kg
+        return base
+
+
+class Frigorifero(Elettrodomestico):
+    def __init__(self, marca, modello, anno_acquisto, guasto, litri: int, ha_freezer: bool):
+        super().__init__(marca, modello, anno_acquisto, guasto)      # Inizializza gli attributi ereditati
+        self.litri = litri      # Capacità interna del frigorifero in litri
+        self.ha_freezer = ha_freezer    # Booleano che indica la presenza o meno del congelatore
+
+    # Override del metodo stima_costo_base con logica specifica per i frigoriferi
+    def stima_costo_base(self):
+        base = super().stima_costo_base()   # Recupera il costo base standard
+        if self.ha_freezer:
+            base += 15.0    # Aggiunge un costo extra se è presente il freezer
+        if self.litri > 300:
+            base += 25.0         # Aggiunge un costo extra se il volume supera i 300 litri
+        return base
+
+
+class Forno(Elettrodomestico):
+    def __init__(self, marca, modello, anno_acquisto, guasto, tipo_alimentazione: str, ha_ventilato: bool):
+        super().__init__(marca, modello, anno_acquisto, guasto)         # Inizializza gli attributi ereditati
+        self.tipo_alimentazione = tipo_alimentazione         # Tipo di alimentazione (es. "elettrico" o "gas")
+        self.ha_ventilato = ha_ventilato        # Booleano per indicare la funzione ventilata
+
+    # Override del metodo stima_costo_base con logica specifica per i forni
+    def stima_costo_base(self):
+        base = super().stima_costo_base()  # Recupera il costo base standard
+        if self.tipo_alimentazione.lower() == "gas":
+            base += 10.0  # Aggiunge un costo per la gestione degli impianti a gas
+        if self.ha_ventilato:
+            base += 15.0  # Aggiunge un costo per la complessità della ventola
+        return base
+
+
+# 3. CLASSE TicketRiparazione
+
+class TicketRiparazione:
+    def __init__(self, id_ticket, elettrodomestico: Elettrodomestico):
+        self.__id_ticket = id_ticket  # Identificativo univoco del ticket
+        self.__elettrodomestico = elettrodomestico  # Oggetto elettrodomestico associato al ticket
+        self.__stato = "aperto"  # Stato iniziale predefinito del ticket ("aperto")
+        self.__note = []  # Lista vuota per tracciare le note di lavorazione
+
+    # Getter per l'ID del ticket
+    def get_id_ticket(self):
+        return self.__id_ticket
+
+    # Getter per l'oggetto elettrodomestico
+    def get_elettrodomestico(self):
+        return self.__elettrodomestico
+
+    # Getter per lo stato corrente
+    def get_stato(self):
+        return self.__stato
+
+    # Setter per modificare lo stato con validazione dei valori ammessi
+    def set_stato(self, stato):
+        stati_validi = ["aperto", "in lavorazione", "chiuso"]
+        if stato.lower() in stati_validi:
+            self.__stato = stato.lower()
+        else:
+            raise ValueError("Stato non valido.")
+
+    # Getter per la lista delle note
+    def get_note(self):
+        return self.__note
+
+    # Aggiunge una nuova nota testuale alla lista delle lavorazioni del ticket
+    def aggiungi_nota(self, testo):
+        self.__note.append(testo)
+
+    # Metodo variadico (*voci_extra) per calcolare il preventivo sommando costi aggiuntivi variabili
+    def calcola_preventivo(self, *voci_extra):
+        # Sfrutta il polimorfismo chiamando il metodo stima_costo_base specifico dell'elettrodomestico associato
+        costo_totale = self.__elettrodomestico.stima_costo_base()
+        
+        # Cicla attraverso tutti i costi extra passati come argomenti variadici e li somma al totale
+        for voce in voci_extra:
+            costo_totale += voce
+            
+        return costo_totale
+
+
+
+# 4. CLASSE Officina
+
+class Officina:
+    def __init__(self, nome):
+        self.nome = nome  # Nome identificativo dell'officina
+        self.tickets = []  # Lista che conterrà tutti i ticket di riparazione gestiti
+
+    # Aggiunge un nuovo oggetto TicketRiparazione alla lista dell'officina
+    def aggiungi_ticket(self, ticket: TicketRiparazione):
+        self.tickets.append(ticket)
+
+    # Cambia lo stato di un ticket specifico impostandolo a "chiuso" tramite il suo ID
+    def chiudi_ticket(self, id_ticket):
+        for t in self.tickets:
+            t_id = t.get_id_ticket() if hasattr(t, "get_id_ticket") else t["id_ticket"]
+            if t_id == id_ticket:
+                t.set_stato("chiuso")  # Aggiorna lo stato del ticket trovato
+                print(f"Ticket {id_ticket} chiuso con successo.")
+                return
+        print(f"Ticket con ID {id_ticket} non trovato.")
+
+    # Stampa a schermo l'elenco di tutti i ticket che non sono ancora stati chiusi
+    def stampa_ticket_aperti(self):
+        print(f"\n--- Ticket Aperti per l'Officina: {self.nome} ---")
+        for t in self.tickets:
+            if t.get_stato() != "chiuso":
+                 eletto = t.get_elettrodomestico()
+                 tipo_ele = type(eletto).__name__  # Ottiene il nome della classe tramite type()
+                 print(f"ID: {t.get_id_ticket()} | Tipo: {tipo_ele} | Stato: {t.get_stato()}")
+
+    # Somma ricorsivamente i preventivi di tutti i ticket presenti nell'officina
+    def totale_preventivi(self, *voci_extra_globali):
+        totale = 0
+        for t in self.tickets:
+            totale += t.calcola_preventivo(*voci_extra_globali)  # Calcola e accumula i preventivi individuali
+        return totale
+
+
+    # 5. USO DI type() E CONTROLLO DEGLI OGGETTI
+
+    def statistiche_per_tipo(self):
+        # Dizionario di appoggio per memorizzare i contatori dei vari tipi di elettrodomestico
+        conteggio = {
+            "Lavatrice": 0,
+            "Frigorifero": 0,
+            "Forno": 0,
+            "Altro": 0
+        }
+
+        # Itera su ciascun ticket registrato nell'officina
+        for t in self.tickets:
+            elettrodomestico = t.get_elettrodomestico()
+            
+            # Utilizza type().__name__ per estrarre esattamente il nome della classe reale dell'oggetto
+            t_name = type(elettrodomestico).__name__
+            
+            # Incrementa il contatore corrispondente nel dizionario
+            if t_name in conteggio:
+                conteggio[t_name] += 1
+            else:
+                conteggio["Altro"] += 1
+
+        # Stampa il report finale basato sui conteggi effettuati con type()
+        print("\n--- Report Statistiche per Tipo di Elettrodomestico ---")
+        print(f"Numero di lavatrici in riparazione: {conteggio['Lavatrice']}")
+        print(f"Numero di frigoriferi in riparazione: {conteggio['Frigorifero']}")
+        print(f"Numero di forni in riparazione: {conteggio['Forno']}")
+        if conteggio["Altro"] > 0:
+            print(f"Numero di altri elettrodomestici: {conteggio['Altro']}")
+            
+            
+# Creiamo un'istanza dell'officina
+mia_officina = Officina("Riparazioni Rapide S.r.l.")
+
+# Creiamo alcuni elettrodomestici (sottoclassi)
+lavatrice_1 = Lavatrice("Bosch", "Series 6", 2021, "Non scarica acqua", capacita_kg=9, giri_centrifuga=1400)
+frigo_1 = Frigorifero("Samsung", "NoFrost Pro", 2019, "Rumore anomalo compressore", litri=350, ha_freezer=True)
+forno_1 = Forno("De Longhi", "Chef 500", 2022, "Resistenza superiore rotta", tipo_alimentazione="elettrico", ha_ventilato=True)
+
+# Creiamo i ticket di riparazione associati
+ticket_1 = TicketRiparazione("TICK-001", lavatrice_1)
+ticket_2 = TicketRiparazione("TICK-002", frigo_1)
+ticket_3 = TicketRiparazione("TICK-003", forno_1)
+
+# Aggiungiamo note ai ticket
+ticket_1.aggiungi_nota("Smontato il filtro di scarico, trovato ostruito.")
+ticket_2.aggiungi_nota("Verificato il gas refrigerante: livello regolare.")
+
+# Aggiungiamo i ticket all'officina
+mia_officina.aggiungi_ticket(ticket_1)
+mia_officina.aggiungi_ticket(ticket_2)
+mia_officina.aggiungi_ticket(ticket_3)
+
+# 1. Mostriamo i ticket aperti
+mia_officina.stampa_ticket_aperti()
+
+# 2. Utilizziamo il metodo variadico calcola_preventivo con costi extra (es. pezzi di ricambio e manodopera)
+preventivo_t1 = ticket_1.calcola_preventivo(15.0, 40.0) # 30(base) + 20(capacità>8) + 15 + 40 = 105.0
+print(f"\nPreventivo stimato per {ticket_1.get_id_ticket()}: €{preventivo_t1}")
+
+# 3. Eseguiamo il report delle statistiche sfruttando type()
+mia_officina.statistiche_per_tipo()
+
+# 4. Calcoliamo il totale dei preventivi globali dell'officina (passando eventualmente costi di gestione fissi)
+totale_generale = mia_officina.totale_preventivi(10.0) # Aggiunge 10€ di gestione pratica per ogni ticket
+print(f"\nIncasso potenziale totale (preventivi + gestione): €{totale_generale}")
